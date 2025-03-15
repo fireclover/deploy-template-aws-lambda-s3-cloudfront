@@ -1,0 +1,28 @@
+{
+  "name": "lambda-s3-cloudfront",
+  "version": "1.0.0",
+  "description": "Infrastructure for an HTTPS static site with a NodeJS API using S3, Lambda and CloudFront",
+  "scripts": {
+    "clean": "rm -rf cdk.out dist cdk.context.json",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "test": "npm run cdk deploy -- --require-approval=never -c domain=test.aws.fireclover.cloud -c subdomain=dynamic -c accountId=515966519418 -c webPath=test/web -c apiPath=test/lambda",
+    "test:integ": "npm run clean && npm run build && npm run test"
+  },
+  "author": {
+    "name": "FireClover",
+    "url": "https://fireclover.no",
+    "organization": true
+  },
+  "devDependencies": {
+    "aws-cdk-lib": "^2.181.1",
+    "constructs": "^10.4.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@aws-solutions-constructs/aws-cloudfront-apigateway-lambda": "^2.78.1",
+    "@types/node": "^22.13.9",
+    "aws-cdk": "^2.1002.0"
+  }
+}
