@@ -34,6 +34,7 @@ export class DynamicSite extends Construct {
     const zone = route53.HostedZone.fromLookup(this, 'Zone', { domainName: props.domainName });
     const siteDomain = props.siteSubDomain + '.' + props.domainName;
     const webSourceFolder = props.webPath;
+    const apiSourceFolder = props.apiPath;
 
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
@@ -67,7 +68,7 @@ export class DynamicSite extends Construct {
 
     const lambdaFunction = defaults.buildLambdaFunction(this, {
       lambdaFunctionProps: {
-        code: lambda.Code.fromAsset(`lambda`),
+        code: lambda.Code.fromAsset(apiSourceFolder),
         functionName: 'ApiLambda-'+props.siteSubDomain,
         runtime: lambda.Runtime.NODEJS_20_X,
         handler: 'index.handler',
