@@ -13,7 +13,8 @@ import { DynamicSite } from './dynamic-site';
  *     "subdomain": "www",
  *     "accountId": "1234567890",
  *     "webPath": "../web/dist",
- *     "apiApth": "../api/dist",
+ *     "apiPath": "../api/dist",
+ *     "apiHandler": "src/index.ts"
  *   }
  * }
 **/
@@ -21,11 +22,12 @@ class DynamicSiteStack extends cdk.Stack {
     constructor(parent: cdk.App, name: string, props: cdk.StackProps) {
         super(parent, name, props);
 
-        new DynamicSite(this, 'StaticSite', {
+        new DynamicSite(this, 'DynamicSite', {
             domainName: this.node.tryGetContext('domain'),
             siteSubDomain: this.node.tryGetContext('subdomain'),
             webPath: this.node.tryGetContext('webPath'),
             apiPath: this.node.tryGetContext('apiPath'),
+            apiHandler: this.node.tryGetContext('apiHandler'),
         });
     }
 }

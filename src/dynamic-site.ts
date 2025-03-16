@@ -18,7 +18,8 @@ export interface DynamicSiteProps {
   domainName: string;
   siteSubDomain: string;
   webPath: string;
-  apiPath: string
+  apiPath: string;
+  apiHandler: string;
 }
 
 /**
@@ -35,6 +36,7 @@ export class DynamicSite extends Construct {
     const siteDomain = props.siteSubDomain + '.' + props.domainName;
     const webSourceFolder = props.webPath;
     const apiSourceFolder = props.apiPath;
+    const apiHandler = props.apiHandler;
 
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
@@ -109,7 +111,7 @@ export class DynamicSite extends Construct {
       defaultRootObject: "index.html",
       domainNames: [siteDomain],
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
-      logBucket: cloudFrontLoggingBucket.logBucket,
+      // logBucket: cloudFrontLoggingBucket.logBucket,
       errorResponses:[
         {
           httpStatus: 403,
