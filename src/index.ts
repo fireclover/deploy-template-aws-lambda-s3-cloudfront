@@ -27,7 +27,7 @@ class DynamicSiteStack extends cdk.Stack {
             siteSubDomain: this.node.tryGetContext('subdomain'),
             webPath: this.node.tryGetContext('webPath'),
             apiPath: this.node.tryGetContext('apiPath'),
-            apiHandler: this.node.tryGetContext('apiHandler'),
+            apiHandler: this.node.tryGetContext('apiHandler') || 'index.handler',
         });
     }
 }

@@ -73,7 +73,7 @@ export class DynamicSite extends Construct {
         code: lambda.Code.fromAsset(apiSourceFolder),
         functionName: 'ApiLambda-'+props.siteSubDomain,
         runtime: lambda.Runtime.NODEJS_20_X,
-        handler: 'index.handler',
+        handler: apiHandler,
         timeout: Duration.seconds(60),
         tracing: lambda.Tracing.ACTIVE,
         //vpc: vpc
