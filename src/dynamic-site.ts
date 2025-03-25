@@ -41,7 +41,7 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
     // Content bucket
-    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
+    const siteBucket = new s3.Bucket(this, 'SiteBucket-'+props.siteSubDomain, {
       bucketName: siteDomain,
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -96,7 +96,7 @@ export class DynamicSite extends Construct {
 
 
     // TLS certificate
-    const certificate = new acm.Certificate(this, 'SiteCertificate', {
+    const certificate = new acm.Certificate(this, 'SiteCertificate-'+props.siteSubDomain, {
       domainName: siteDomain,
       validation: acm.CertificateValidation.fromDns(zone),
     });
@@ -105,7 +105,7 @@ export class DynamicSite extends Construct {
 
     // CloudFront distribution
     // const defaultDist = new defaults.CloudFrontDistributionForApiGateway(this);
-    const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
+    const distribution = new cloudfront.Distribution(this, 'SiteDistribution-'+props.siteSubDomain, {
     // const distributionS3andApiGateway = {
       certificate: certificate,
       defaultRootObject: "index.html",
@@ -136,17 +136,17 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'DistributionId', { value: distribution.distributionId });
 
     // Route53 alias record for the CloudFront distribution
-    new route53.ARecord(this, 'SiteAliasRecord', {
+    new route53.ARecord(this, 'SiteAliasRecord-'+props.siteSubDomain, {
       recordName: siteDomain,
       target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
       zone
     });
 
     // Deploy site contents to S3 bucket
-    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
+    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation-'+props.siteSubDomain, {
       sources: [s3deploy.Source.asset(webSourceFolder)],
       destinationBucket: siteBucket,
-      distribution: distribution,
+      distribution,
       distributionPaths: ['/*'],
     });
   }
