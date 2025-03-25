@@ -1,6 +1,6 @@
 {
   "name": "lambda-s3-cloudfront",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Infrastructure for an HTTPS static site with a NodeJS API using S3, Lambda and CloudFront",
   "scripts": {
     "clean": "rm -rf cdk.out dist cdk.context.json",
