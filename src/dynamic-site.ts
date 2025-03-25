@@ -63,9 +63,9 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Bucket', { value: siteBucket.bucketName });
 
     // Log bucket
-    const cloudFrontLoggingBucket = defaults.createCloudFrontLoggingBucket(this, 'CloudFrontLogBucket', 
-      { loggingBucketProps: { objectOwnership: s3.ObjectOwnership.OBJECT_WRITER } });
-    new CfnOutput(this, 'LogBucket', { value: cloudFrontLoggingBucket.logBucket.bucketName });
+    // const cloudFrontLoggingBucket = defaults.createCloudFrontLoggingBucket(this, 'CloudFrontLogBucket', 
+    //   { loggingBucketProps: { objectOwnership: s3.ObjectOwnership.OBJECT_WRITER } });
+    // new CfnOutput(this, 'LogBucket', { value: cloudFrontLoggingBucket.logBucket.bucketName });
 
 
     const lambdaFunction = defaults.buildLambdaFunction(this, {
