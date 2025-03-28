@@ -43,7 +43,7 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
     // Content bucket
-    const siteBucket = new s3.Bucket(this, 'SiteBucket-'+props.siteSubDomain, {
+    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
       bucketName: siteDomain,
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
@@ -70,7 +70,7 @@ export class DynamicSite extends Construct {
     // new CfnOutput(this, 'LogBucket', { value: cloudFrontLoggingBucket.logBucket.bucketName });
 
 
-    const lambdaFunction = defaults.buildLambdaFunction(this, {
+    const lambdaFunction = defaults.buildLambdaFunction(this, 'ApiLambda', {
       lambdaFunctionProps: {
         code: lambda.Code.fromAsset(apiSourceFolder),
         functionName: 'ApiLambda-'+props.siteSubDomain,
@@ -98,7 +98,7 @@ export class DynamicSite extends Construct {
 
 
     // TLS certificate
-    const certificate = new acm.Certificate(this, 'SiteCertificate-'+props.siteSubDomain, {
+    const certificate = new acm.Certificate(this, 'SiteCertificate', {
       domainName: siteDomain,
       validation: acm.CertificateValidation.fromDns(zone),
     });
@@ -133,7 +133,7 @@ export class DynamicSite extends Construct {
     };
     
     // const defaultDist = new defaults.CloudFrontDistributionForApiGateway(this);
-    const distribution = new cloudfront.Distribution(this, 'SiteDistribution-'+props.siteSubDomain, {
+    const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
     // const distributionS3andApiGateway = {
       certificate: certificate,
       defaultRootObject: "index.html",
@@ -148,29 +148,29 @@ export class DynamicSite extends Construct {
           ttl: Duration.minutes(30),
         }
       ],
-      defaultBehavior: defaultBehavior,
+      defaultBehavior,
       additionalBehaviors: {
         'api/*': {
           origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api, {}),
         }
-      }
+      },
     });
 
     new CfnOutput(this, 'DistributionId', { value: distribution.distributionId });
 
     // Route53 alias record for the CloudFront distribution
-    new route53.ARecord(this, 'SiteAliasRecord-'+props.siteSubDomain, {
+    new route53.ARecord(this, 'SiteAliasRecord', {
       recordName: siteDomain,
       target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
       zone
     });
 
     // Deploy site contents to S3 bucket
-    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation-'+props.siteSubDomain, {
+    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
       sources: [s3deploy.Source.asset(webSourceFolder)],
       destinationBucket: siteBucket,
       distribution,
-      distributionPaths: ['/*'],
+      //distributionPaths: ['/*'],
     });
   }
 }
