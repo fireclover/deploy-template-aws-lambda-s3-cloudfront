@@ -14,9 +14,12 @@ import { DynamicSite } from './dynamic-site';
  *     "accountId": "1234567890",
  *     "webPath": "../web/dist",
  *     "apiPath": "../api/dist",
- *     "apiHandler": "src/index.ts"
+ *     "apiHandler": "src/index.ts",
+ *     "folderRedirects": false
  *   }
  * }
+ *
+ * folderRedirects=true is needed for non SPA sites like MkDocs, where /somepath/ should redirect to /somepath/index.html
 **/
 class DynamicSiteStack extends cdk.Stack {
     constructor(parent: cdk.App, name: string, props: cdk.StackProps) {
@@ -28,6 +31,7 @@ class DynamicSiteStack extends cdk.Stack {
             webPath: this.node.tryGetContext('webPath'),
             apiPath: this.node.tryGetContext('apiPath'),
             apiHandler: this.node.tryGetContext('apiHandler') || 'index.handler',
+            folderRedirects: this.node.tryGetContext('folderRedirects')
         });
     }
 }
@@ -48,7 +52,7 @@ new DynamicSiteStack(app, `DynamicSite-${app.node.tryGetContext('subdomain')}`, 
          * Stack must be in us-east-1, because the ACM certificate for a
          * global CloudFront distribution must be requested in us-east-1.
          */
-        region: 'us-east-1',
+        region: app.node.tryGetContext('folderRedirects') || 'us-east-1',
     }
 });
 
