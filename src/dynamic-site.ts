@@ -12,6 +12,7 @@ import { Construct } from 'constructs';
 import * as defaults from '@aws-solutions-constructs/core';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as api from 'aws-cdk-lib/aws-apigateway';
+import * as crypto from 'crypto';
 //import * as path from 'path';
 
 export interface DynamicSiteProps {
@@ -44,7 +45,7 @@ export class DynamicSite extends Construct {
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, 'SiteBucket', {
-      bucketName: siteDomain,
+      bucketName: props.siteSubDomain + crypto.randomUUID();,
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
 
