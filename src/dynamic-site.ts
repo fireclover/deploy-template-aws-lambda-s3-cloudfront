@@ -45,7 +45,7 @@ export class DynamicSite extends Construct {
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, 'SiteBucket', {
-      bucketName: props.siteSubDomain + crypto.randomUUID();,
+      bucketName: props.siteSubDomain + crypto.randomUUID(),
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
 
