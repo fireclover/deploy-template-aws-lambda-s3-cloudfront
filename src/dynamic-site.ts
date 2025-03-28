@@ -170,7 +170,7 @@ export class DynamicSite extends Construct {
       sources: [s3deploy.Source.asset(webSourceFolder)],
       destinationBucket: siteBucket,
       distribution,
-      //distributionPaths: ['/*'],
+      distributionPaths: ['/*'],
     });
   }
 }
