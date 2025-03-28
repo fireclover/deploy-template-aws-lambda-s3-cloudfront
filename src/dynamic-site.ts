@@ -20,6 +20,7 @@ export interface DynamicSiteProps {
   webPath: string;
   apiPath: string;
   apiHandler: string;
+  folderRedirects: boolean;  
 }
 
 /**
@@ -37,6 +38,7 @@ export class DynamicSite extends Construct {
     const webSourceFolder = props.webPath;
     const apiSourceFolder = props.apiPath;
     const apiHandler = props.apiHandler;
+    const folderRedirects = props.folderRedirects;
 
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
@@ -104,6 +106,32 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Certificate', { value: certificate.certificateArn });
 
     // CloudFront distribution
+    const defaultBehavior = folderRedirects ? {
+        origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
+        compress: true,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        functionAssociations: [{
+          eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+          function: new cloudfront.Function(this, 'Function', {
+            code: cloudfront.FunctionCode.fromInline('function handler(event) { \
+              var request = event.request; \
+              if (request.uri !== "/" && (request.uri.endsWith("/") || request.uri.lastIndexOf(".") < request.uri.lastIndexOf("/"))) { \
+                request.uri = request.uri.endsWith("/") ? request.uri.concat("index.html") : request.uri.concat("/index.html"); \
+              } \
+              return request; \
+            }'),
+            runtime: cloudfront.FunctionRuntime.JS_2_0,
+            autoPublish: true
+          }),
+        }],
+    } : {
+        origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
+        compress: true,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    };
+    
     // const defaultDist = new defaults.CloudFrontDistributionForApiGateway(this);
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution-'+props.siteSubDomain, {
     // const distributionS3andApiGateway = {
@@ -120,12 +148,7 @@ export class DynamicSite extends Construct {
           ttl: Duration.minutes(30),
         }
       ],
-      defaultBehavior: {
-          origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
-          compress: true,
-          allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      },
+      defaultBehavior: defaultBehavior,
       additionalBehaviors: {
         'api/*': {
           origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api, {}),
