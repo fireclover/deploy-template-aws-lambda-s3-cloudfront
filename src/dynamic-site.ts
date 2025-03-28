@@ -70,7 +70,7 @@ export class DynamicSite extends Construct {
     // new CfnOutput(this, 'LogBucket', { value: cloudFrontLoggingBucket.logBucket.bucketName });
 
 
-    const lambdaFunction = defaults.buildLambdaFunction(this, 'ApiLambda', {
+    const lambdaFunction = defaults.buildLambdaFunction(this, {
       lambdaFunctionProps: {
         code: lambda.Code.fromAsset(apiSourceFolder),
         functionName: 'ApiLambda-'+props.siteSubDomain,
