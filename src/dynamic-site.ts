@@ -21,7 +21,8 @@ export interface DynamicSiteProps {
   webPath: string;
   apiPath: string;
   apiHandler: string;
-  folderRedirects: boolean;  
+  folderRedirects: boolean;
+  environment: { [key: string]: string; };
 }
 
 /**
@@ -40,12 +41,13 @@ export class DynamicSite extends Construct {
     const apiSourceFolder = props.apiPath;
     const apiHandler = props.apiHandler;
     const folderRedirects = props.folderRedirects;
+    const environment = props.environment;
 
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, 'SiteBucket', {
-      bucketName: props.siteSubDomain + crypto.randomUUID(),
+      bucketName: props.siteSubDomain + crypto.randomUUID(), //siteDomain
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
 
@@ -79,6 +81,7 @@ export class DynamicSite extends Construct {
         handler: apiHandler,
         timeout: Duration.seconds(60),
         tracing: lambda.Tracing.ACTIVE,
+        environment,
         //vpc: vpc
       }
     });
