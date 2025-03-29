@@ -75,7 +75,7 @@ export class DynamicSite extends Construct {
       lambdaFunctionProps: {
         code: lambda.Code.fromAsset(apiSourceFolder),
         functionName: 'ApiLambda-'+props.siteSubDomain,
-        runtime: lambda.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         handler: apiHandler,
         timeout: Duration.seconds(60),
         tracing: lambda.Tracing.ACTIVE,

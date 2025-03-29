@@ -14,7 +14,7 @@ import { DynamicSite } from './dynamic-site';
  *     "accountId": "1234567890",
  *     "webPath": "../web/dist",
  *     "apiPath": "../api/dist",
- *     "apiHandler": "src/index.ts",
+ *     "apiHandler": "dist/index.handler",
  *     "folderRedirects": false
  *   }
  * }
@@ -30,7 +30,7 @@ class DynamicSiteStack extends cdk.Stack {
             siteSubDomain: this.node.tryGetContext('subdomain'),
             webPath: this.node.tryGetContext('webPath'),
             apiPath: this.node.tryGetContext('apiPath'),
-            apiHandler: this.node.tryGetContext('apiHandler') || 'index.handler',
+            apiHandler: this.node.tryGetContext('apiHandler') || 'dist/index.handler',
             folderRedirects: this.node.tryGetContext('folderRedirects')
         });
     }
