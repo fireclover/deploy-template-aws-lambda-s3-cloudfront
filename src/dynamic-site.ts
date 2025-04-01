@@ -155,8 +155,17 @@ export class DynamicSite extends Construct {
       defaultBehavior,
       additionalBehaviors: {
         'api/*': {
-          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api, {}),
-        }
+          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+        },
+        '.well-known/*': {
+          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+        },
+        'oauth2/*': {
+          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+        },
+        'saml/*': {
+          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+        },           
       },
     });
 
