@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 import { DynamicSite } from './dynamic-site';
-import path = require('path');
 
 
 /**
@@ -25,7 +24,9 @@ import path = require('path');
 class DynamicSiteStack extends cdk.Stack {
     constructor(parent: cdk.App, name: string, props: cdk.StackProps) {
         super(parent, name, props);
-        const prepath = path.basename(process.cwd()) != 'test' ? '../' : ''
+
+        const prepath = this.node.tryGetContext('webPath').toString().includes('test') ? '' : '../'
+        
         new DynamicSite(this, 'DynamicSite', {
             domainName: this.node.tryGetContext('domain'),
             siteSubDomain: this.node.tryGetContext('subdomain'),
