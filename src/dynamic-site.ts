@@ -111,12 +111,8 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Certificate', { value: certificate.certificateArn });
 
     // CloudFront distribution
-    const defaultBehavior = folderRedirects ? {
-        origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
-        compress: true,
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        functionAssociations: [{
+    const defaultBehaviorViewerRequest = folderRedirects ?  {
+      functionAssociations: [{
           eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
           function: new cloudfront.Function(this, 'Function', {
             code: cloudfront.FunctionCode.fromInline('function handler(event) { \
@@ -130,14 +126,18 @@ export class DynamicSite extends Construct {
             autoPublish: true
           }),
         }],
-    } : {
-        origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
-        compress: true,
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      } : {};
+      
+    const defaultBehavior =  {
+      origin: cloudfront_origins.S3BucketOrigin.withOriginAccessControl(siteBucket),
+      compress: true,
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      ...defaultBehaviorViewerRequest,
     };
     
     // const defaultDist = new defaults.CloudFrontDistributionForApiGateway(this);
+    const origin = new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api);
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
     // const distributionS3andApiGateway = {
       certificate: certificate,
@@ -162,16 +162,16 @@ export class DynamicSite extends Construct {
       defaultBehavior,
       additionalBehaviors: {
         'api/*': {
-          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+          origin,
         },
         '.well-known/*': {
-          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+          origin,
         },
         'oauth2/*': {
-          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+          origin,
         },
         'saml/*': {
-          origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+          origin,
         },           
       },
     });
