@@ -26,7 +26,7 @@ class DynamicSiteStack extends cdk.Stack {
     constructor(parent: cdk.App, name: string, props: cdk.StackProps) {
         super(parent, name, props);
 
-        const prepath = this.node.tryGetContext('webPath').toString().includes('test') ? '' : '../'
+        const prepath = this.node.tryGetContext('webPath').toString().includes('test') ? '' : '../';
         const serviceName = this.node.tryGetContext('serviceName') || this.node.tryGetContext('subdomain');
         const secrets = this.node.tryGetContext('secrets');
         const environment = this.node.tryGetContext('env') || secrets; // make sure it is a hashmap or undefined

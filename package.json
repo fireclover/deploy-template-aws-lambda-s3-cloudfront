@@ -1,5 +1,5 @@
 {
-  "name": "lambda-s3-cloudfront",
+  "name": "@fireclover/deploy-template-aws-lambda-s3-cloudfront",
   "version": "1.0.2",
   "description": "Infrastructure for an HTTPS static site with a NodeJS API using S3, Lambda and CloudFront",
   "scripts": {
