@@ -22,6 +22,7 @@ export interface DynamicSiteProps {
   apiPath: string;
   apiHandler: string;
   folderRedirects: boolean;
+  isSpa: boolean;
   environment: { [key: string]: string; };
 }
 
@@ -145,7 +146,13 @@ export class DynamicSite extends Construct {
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       // logBucket: cloudFrontLoggingBucket.logBucket,
       errorResponses:[
-        {
+        props.isSpa 
+        ? {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+        } 
+        : {
           httpStatus: 403,
           responseHttpStatus: 403,
           responsePagePath: '/error.html',
