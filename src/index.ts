@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { DynamicSite } from './dynamic-site';
 
 
@@ -26,7 +27,19 @@ class DynamicSiteStack extends cdk.Stack {
         super(parent, name, props);
 
         const prepath = this.node.tryGetContext('webPath').toString().includes('test') ? '' : '../'
-        
+        const serviceName = this.node.tryGetContext('serviceName') || this.node.tryGetContext('subdomain');
+        const secrets = this.node.tryGetContext('secrets');
+        const environment = this.node.tryGetContext('env') || secrets; // make sure it is a hashmap or undefined
+        if (secrets) {            
+            for (const [key, value] of Object.entries(secrets)) { 
+              environment[key] = !value
+                    ? secretsmanager.Secret.fromSecretNameV2(this, serviceName + 'importedSecret' + key, key).secretValueFromJson('password').unsafeUnwrap()
+                    : (typeof(value) == 'string' && value.includes("arn"))
+                        ? secretsmanager.Secret.fromSecretCompleteArn(this, serviceName + 'importedArnSecret' + key, value).secretValueFromJson('password').unsafeUnwrap()
+                        : 'ERROR: missing secret';
+            };
+        };
+
         new DynamicSite(this, 'DynamicSite', {
             domainName: this.node.tryGetContext('domain'),
             siteSubDomain: this.node.tryGetContext('subdomain'),
@@ -34,7 +47,7 @@ class DynamicSiteStack extends cdk.Stack {
             apiPath: prepath + this.node.tryGetContext('apiPath'),
             apiHandler: this.node.tryGetContext('apiHandler') || 'dist/index.handler',
             folderRedirects: this.node.tryGetContext('folderRedirects'),
-            environment: this.node.tryGetContext('env'),
+            environment,
         });
     }
 }
