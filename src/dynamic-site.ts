@@ -83,6 +83,7 @@ export class DynamicSite extends Construct {
         timeout: Duration.seconds(60),
         tracing: lambda.Tracing.ACTIVE,
         environment,
+        memorySize: 1024,
         //vpc: vpc
       }
     });
