@@ -48,6 +48,7 @@ class DynamicSiteStack extends cdk.Stack {
             apiHandler: this.node.tryGetContext('apiHandler') || 'dist/index.handler',
             folderRedirects: this.node.tryGetContext('folderRedirects'),
             isSpa: this.node.tryGetContext('isSpa') || true,
+            memory: this.node.tryGetContext('memory') || 1024,
             environment,
         });
     }

@@ -24,6 +24,7 @@ export interface DynamicSiteProps {
   folderRedirects: boolean;
   isSpa: boolean;
   environment: { [key: string]: string; };
+  memory: number;
 }
 
 /**
@@ -43,6 +44,7 @@ export class DynamicSite extends Construct {
     const apiHandler = props.apiHandler;
     const folderRedirects = props.folderRedirects;
     const environment = props.environment;
+    const memorySize = props.memory; 
 
     new CfnOutput(this, 'Site', { value: 'https://' + siteDomain });
 
@@ -83,7 +85,7 @@ export class DynamicSite extends Construct {
         timeout: Duration.seconds(60),
         tracing: lambda.Tracing.ACTIVE,
         environment,
-        memorySize: 1024,
+        memorySize,
         //vpc: vpc
       }
     });
