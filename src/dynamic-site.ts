@@ -136,10 +136,15 @@ export class DynamicSite extends Construct {
       ...defaultBehaviorViewerRequest,
     };
     
-    // const defaultDist = new defaults.CloudFrontDistributionForApiGateway(this);
-    const origin = new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api);
+    const lambdaOrigin: cloudfront.BehaviorOptions = {
+      origin: new cloudfront_origins.RestApiOrigin(regionalLambdaRestApiResponse.api),
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+      cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
+      cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+      originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
+    };
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
-    // const distributionS3andApiGateway = {
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
       certificate: certificate,
       defaultRootObject: "index.html",
       domainNames: [siteDomain],
@@ -161,18 +166,10 @@ export class DynamicSite extends Construct {
       ],
       defaultBehavior,
       additionalBehaviors: {
-        'api/*': {
-          origin,
-        },
-        '.well-known/*': {
-          origin,
-        },
-        'oauth2/*': {
-          origin,
-        },
-        'saml/*': {
-          origin,
-        },           
+        'api/*': lambdaOrigin,
+        '.well-known/*': lambdaOrigin,
+        'oauth2/*': lambdaOrigin,
+        'saml/*': lambdaOrigin,
       },
     });
 
