@@ -193,7 +193,7 @@ export class DynamicSite extends Construct {
       memoryLimit: 1024,
       distribution,
       distributionPaths: ['/*'],
-      useEfs: true,  //This is the flag to enable efs storage.
+      //useEfs: true,  //This is the flag to enable efs storage.
       retainOnDelete: false,
     });
   }
