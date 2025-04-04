@@ -189,8 +189,12 @@ export class DynamicSite extends Construct {
     new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
       sources: [s3deploy.Source.asset(webSourceFolder)],
       destinationBucket: siteBucket,
+      destinationKeyPrefix: 'efs/',
+      memoryLimit: 1024,
       distribution,
       distributionPaths: ['/*'],
+      useEfs: true,  //This is the flag to enable efs storage.
+      retainOnDelete: false,
     });
   }
 }
