@@ -100,7 +100,11 @@ export class DynamicSite extends Construct {
         defaultMethodOptions: {
           authorizationType: api.AuthorizationType.NONE,        
         },
-        handler: lambdaFunction
+        handler: lambdaFunction,
+        defaultCorsPreflightOptions: {
+    allowOrigins: api.Cors.ALL_ORIGINS,
+    allowMethods: api.Cors.ALL_METHODS // this is also the default
+  },
       });
 
 
