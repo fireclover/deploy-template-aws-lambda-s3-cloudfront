@@ -164,7 +164,6 @@ export class DynamicSite extends Construct {
           httpStatus: 403,
           responseHttpStatus: 403,
           responsePagePath: '/error.html',
-          ttl: Duration.minutes(30),
         }
       ],
       defaultBehavior,
