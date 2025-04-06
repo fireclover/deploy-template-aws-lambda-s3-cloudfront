@@ -148,7 +148,7 @@ export class DynamicSite extends Construct {
       allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
       cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD,
       cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-      originRequestPolicy: cloudfront.OriginRequestPolicy.CORS_CUSTOM_ORIGIN,
+      originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
     };
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
       priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
