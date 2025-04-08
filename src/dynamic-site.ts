@@ -160,7 +160,7 @@ export class DynamicSite extends Construct {
       functionAssociations: [{
           eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
           function: new cloudfront.Function(this, 'CF-Function', {
-            code: cloudfront.FunctionCode.fromFile({ filePath: folderRedirects ? 'cf-function-folders.js' : props.isSpa ? 'cf-function-spa.js' : 'cf-function-default.js' }),
+            code: cloudfront.FunctionCode.fromFile({ filePath: folderRedirects ? 'dist/cf-function-folders.js' : props.isSpa ? 'dist/cf-function-spa.js' : 'dist/cf-function-default.js' }),
             runtime: cloudfront.FunctionRuntime.JS_2_0,
             autoPublish: true
           }),
