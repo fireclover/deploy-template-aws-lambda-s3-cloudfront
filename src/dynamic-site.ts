@@ -118,17 +118,53 @@ export class DynamicSite extends Construct {
     new CfnOutput(this, 'Certificate', { value: certificate.certificateArn });
 
     // CloudFront distribution
-    const defaultBehaviorViewerRequest = folderRedirects ?  {
-      functionAssociations: [{
-          eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-          function: new cloudfront.Function(this, 'Function', {
-            code: cloudfront.FunctionCode.fromInline('function handler(event) { \
+    const CFfunction = folderRedirects 
+      ? 'function handler(event) { \
               var request = event.request; \
               if (request.uri !== "/" && (request.uri.endsWith("/") || request.uri.lastIndexOf(".") < request.uri.lastIndexOf("/"))) { \
                 request.uri = request.uri.endsWith("/") ? request.uri.concat("index.html") : request.uri.concat("/index.html"); \
               } \
               return request; \
-            }'),
+            }'
+        : props.isSpa 
+          ? 'var level = 0; // FOR SPAs - subdirectory level where index.html is located. \
+          var regexExpr = /^\/.+(\.\w+$)/; // Regex expression than matches paths requestiong an object. i.e: /route1/my-picture.png \
+          function handler(event) { \
+              var request = event.request; \
+              var olduri = request.uri; \
+              if (isRoute(olduri)) { // if is a route request. i.e: /route1 \
+                  var defaultPath = ""; \
+                  var parts = olduri \
+                      .replace(/^\//,"") // remove leading "/" \
+                      .replace(/\/$/,"") // remove triling "/" if any \
+                      .split("/"); // split uri into array of parts. i.e: ["route1", "my-picture.png"] \
+                  var nparts = parts.length; \
+                  // determine the limit as either level or nparts, whichever is lower \
+                  var limit = (level <= nparts) ? level : nparts; \
+                  // build the default path. i.e: /route1 \
+                  for (var i = 0; i < limit; i++) { \
+                      defaultPath += "/" + parts[i]; \
+                  } \
+                  var newuri = defaultPath + "/index.html"; \
+                  request.uri = newuri; \
+                  console.log("Request for [" + olduri + "], rewritten to [" + newuri + "]"); \
+              } \
+              return request; \
+          }; \
+          // Returns true if uri is a route. i.e: /route1 \
+          // Returns false if uri is a file. i.e: /route1/index.html \
+          function isRoute(uri) { \
+              return !regexExpr.test(uri); \
+          }'
+          : 'return {error: "not spa and not folder redirects. unsure what to do"}';
+
+
+
+    const defaultBehaviorViewerRequest = folderRedirects || props.isSpa ?  {
+      functionAssociations: [{
+          eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+          function: new cloudfront.Function(this, 'Function', {
+            code: cloudfront.FunctionCode.fromInline(CFfunction),
             runtime: cloudfront.FunctionRuntime.JS_2_0,
             autoPublish: true
           }),
@@ -157,19 +193,13 @@ export class DynamicSite extends Construct {
       domainNames: [siteDomain],
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       // logBucket: cloudFrontLoggingBucket.logBucket,
-      errorResponses:[
-        props.isSpa 
-        ? {
-          httpStatus: 403,
-          responseHttpStatus: 200,
-          responsePagePath: '/index.html',
-        } 
-        : {
-          httpStatus: 403,
-          responseHttpStatus: 403,
-          responsePagePath: '/error.html',
-        }
-      ],
+      // errorResponses:[
+      //   {
+      //     httpStatus: 403,
+      //     responseHttpStatus: 403,
+      //     responsePagePath: '/error.html',
+      //   }
+      // ],
       defaultBehavior,
       additionalBehaviors: {
         'api/*': lambdaOrigin,
