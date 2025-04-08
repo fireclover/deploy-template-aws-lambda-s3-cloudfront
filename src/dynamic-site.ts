@@ -193,13 +193,13 @@ export class DynamicSite extends Construct {
       domainNames: [siteDomain],
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       // logBucket: cloudFrontLoggingBucket.logBucket,
-      // errorResponses:[
-      //   {
-      //     httpStatus: 403,
-      //     responseHttpStatus: 403,
-      //     responsePagePath: '/error.html',
-      //   }
-      // ],
+      errorResponses:[
+        {
+          httpStatus: 403,
+          responseHttpStatus: 403,
+          responsePagePath: '/error.html',
+        }
+      ],
       defaultBehavior,
       additionalBehaviors: {
         'api/*': lambdaOrigin,
